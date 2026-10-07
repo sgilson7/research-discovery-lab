@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Research discovery lab</title>
+<meta name="description" content="A follow-along lab for setting up research profiles, author records, crawling checks and discovery tests. Everything stays in your browser.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#stations">Skip to the stations</a>
+<main>
+  <header class="masthead">
+    <h1 id="title">Research discovery lab</h1>
+    <p class="sub" id="subtitle"></p>
+    <p class="permission" id="permission"></p>
+  </header>
+
+  <noscript>
+    <p class="note">This lab builds its links from the details you type, so it needs JavaScript. The stations are also listed in the talk slides if you would rather work from those.</p>
+  </noscript>
+
+  <section class="panel" id="details-panel" aria-labelledby="details-h">
+    <h2 id="details-h">Your details</h2>
+    <p class="note">Every field is optional. What you fill in is used to build direct links to your own records. It is stored in this browser only, and nothing is sent anywhere.</p>
+    <div id="fields" class="fields"></div>
+    <p class="actions">
+      <button type="button" id="clear">Clear my details</button>
+      <span id="saved" class="saved" role="status"></span>
+    </p>
+  </section>
+
+  <section class="panel progress" aria-labelledby="progress-h">
+    <h2 id="progress-h">Progress</h2>
+    <div class="bar"><div id="bar-done"></div><div id="bar-skip"></div></div>
+    <p id="progress-text" role="status"></p>
+    <p class="actions"><button type="button" id="copy">Copy my summary</button> <span id="copied" class="saved" role="status"></span></p>
+  </section>
+
+  <div id="stations"></div>
+
+  <footer class="foot">
+    <p id="discussion-wrap"></p>
+    <p><a href="https://sgilson7.github.io/">Sam Gilson</a> · <a href="https://github.com/sgilson7/research-discovery-lab">Source</a></p>
+  </footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
