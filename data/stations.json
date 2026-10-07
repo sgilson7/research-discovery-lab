@@ -1,91 +1,99 @@
 {
   "title": "Research discovery lab",
-  "subtitle": "Set up your public record so a reader who knows the topic can reach the paper. Follow along with the talk, or go at your own pace.",
-  "permission": "Nothing here is required. Skip any task, skip a whole station, and come back later. Your answers stay in this browser and are not sent anywhere.",
+  "subtitle": "Build a public route from your name or research question to the right paper, explanation, and source. Follow along with the talk, or work through the stations at your own pace.",
+  "permission": "Add only the details you want to use during the lab. They stay in this browser. Skip any step that does not apply and come back later.",
+  "detailsNote": "These details build direct links to your own public records. Leave anything blank that you do not have yet.",
+  "fieldGroups": [
+    { "name": "You", "fields": ["name", "institution", "site"] },
+    { "name": "Your records", "fields": ["orcid", "scholar", "s2", "openalex"] }
+  ],
   "fields": [
     { "id": "name", "label": "Name you publish under", "placeholder": "Jane Q. Researcher", "hint": "Used to build search links when you do not have an id yet." },
-    { "id": "orcid", "label": "ORCID iD", "placeholder": "0000-0002-1825-0097", "hint": "Digits and hyphens only. Leave empty if you have not registered." },
+    { "id": "institution", "label": "Institution or lab", "placeholder": "North Carolina State University", "hint": "Used for the lab-page and ROR checks." },
+    { "id": "site", "label": "Your website", "placeholder": "https://example.github.io", "hint": "No trailing slash. Leave empty if you do not have one yet." },
+    { "id": "orcid", "label": "ORCID iD", "placeholder": "0000-0002-1825-0097", "hint": "Digits and hyphens only. Paste the whole URL if that is easier." },
     { "id": "scholar", "label": "Google Scholar id", "placeholder": "UIYAyjoAAAAJ", "hint": "The user= value in your profile URL." },
     { "id": "s2", "label": "Semantic Scholar author id", "placeholder": "2387936753", "hint": "The number in your author page URL." },
-    { "id": "openalex", "label": "OpenAlex author id", "placeholder": "A5125954125", "hint": "Starts with A. Find it from your ORCID below." },
-    { "id": "site", "label": "Your website", "placeholder": "https://example.github.io", "hint": "No trailing slash. Leave empty if you do not have one yet." },
-    { "id": "institution", "label": "Institution or lab", "placeholder": "North Carolina State University", "hint": "Used for the lab-page and ROR checks." }
+    { "id": "openalex", "label": "OpenAlex author id", "placeholder": "A5125954125", "hint": "Starts with A. The ORCID lookup below finds it." }
   ],
   "stations": [
     {
       "id": "records",
-      "name": "The records that identify you",
-      "slides": "Slides 4 to 8",
-      "intro": "A reader arrives at an index before they arrive at your paper. If the index cannot say which work is yours, the page you write inherits that. Claim, correct, link, then check the public view.",
+      "short": "Profiles",
+      "name": "Start with the records that identify you",
+      "connection": "Talk: slides 4–8 · Start with the records that identify you",
+      "intro": "Author records are often the first place a reader or search system encounters your work. Claim the records you use, correct the paper list, connect your website, then check the public view.",
       "tasks": [
         {
           "id": "orcid-public",
-          "title": "Read your ORCID record the way a stranger reads it",
-          "body": "Open the public record while signed out, in a private window. What you see signed in is not what a reader or an indexing service sees.",
+          "title": "Check your public ORCID record",
+          "body": "Open it while signed out. Confirm that the name, affiliation, works, and links you expect a reader to see are actually public.",
           "links": [
-            { "label": "My public ORCID record", "tpl": "https://orcid.org/{orcid}", "needs": ["orcid"], "fallbackLabel": "Register or sign in to ORCID", "fallback": "https://orcid.org/signin" },
+            { "label": "Open my ORCID record", "tpl": "https://orcid.org/{orcid}", "needs": ["orcid"] },
             { "label": "Edit my ORCID record", "href": "https://orcid.org/my-orcid" }
           ]
         },
         {
           "id": "orcid-fill",
-          "title": "Add the name you publish under, your affiliation, and your website",
-          "body": "A persistent id is only useful if it carries enough to tell you apart from a namesake. Set visibility to everyone for the parts you want read.",
+          "title": "Add the details that distinguish you",
+          "body": "Use the name you publish under, your current affiliation, and your website. Set the visibility of each item to match what you want readers and indexing services to see.",
           "links": [
             { "label": "Edit my ORCID record", "href": "https://orcid.org/my-orcid" },
-            { "label": "ORCID visibility settings help", "href": "https://support.orcid.org/hc/en-us/articles/360006897614" }
+            { "label": "ORCID visibility settings", "href": "https://support.orcid.org/hc/en-us/articles/360006897614", "kind": "reference" }
           ]
         },
         {
           "id": "orcid-works",
-          "title": "Add your works to ORCID from Crossref rather than by hand",
-          "body": "Search Crossref for your name, then add the matching works through ORCID's Search and link wizard. A work added from the publisher record carries its DOI.",
+          "title": "Connect your works through DOI records",
+          "body": "Use ORCID's Search and link tools or DOI records where possible, then check the imported title, authors, and DOI.",
           "links": [
-            { "label": "Find my works in Crossref", "tpl": "https://search.crossref.org/?q={name}&from_ui=yes", "needs": ["name"], "fallbackLabel": "Crossref search", "fallback": "https://search.crossref.org/" },
-            { "label": "Works attached to my ORCID (Crossref API)", "tpl": "https://api.crossref.org/works?filter=orcid:{orcid}&rows=50&select=DOI,title,author", "needs": ["orcid"] },
-            { "label": "ORCID Search and link", "href": "https://orcid.org/my-orcid" }
+            { "label": "Find my works in Crossref", "tpl": "https://search.crossref.org/?q={name}&from_ui=yes", "needs": ["name"] },
+            { "label": "Works already tied to my ORCID", "tpl": "https://api.crossref.org/works?filter=orcid:{orcid}&rows=50&select=DOI,title,author", "needs": ["orcid"] },
+            { "label": "ORCID Search and link", "href": "https://orcid.org/my-orcid" },
+            { "label": "Crossref search", "href": "https://search.crossref.org/", "kind": "reference" }
           ]
         },
         {
           "id": "s2-claim",
-          "title": "Claim your Semantic Scholar author page and read the paper list",
-          "body": "Find a paper you wrote, follow your name to the author page, then claim it. Check for papers that are not yours as carefully as for papers that are missing.",
+          "title": "Claim and clean up your Semantic Scholar page",
+          "body": "Find a paper you wrote, open the author page from your name, and claim it. Check both missing papers and papers that belong to someone else.",
           "links": [
-            { "label": "My Semantic Scholar author page", "tpl": "https://www.semanticscholar.org/author/{s2}", "needs": ["s2"], "fallbackLabel": "Search Semantic Scholar for my name", "fallback": "https://www.semanticscholar.org/search?q={name}", "fallbackNeeds": ["name"] },
+            { "label": "Open my Semantic Scholar page", "tpl": "https://www.semanticscholar.org/author/{s2}", "needs": ["s2"] },
             { "label": "Search Semantic Scholar for my name", "tpl": "https://www.semanticscholar.org/search?q={name}", "needs": ["name"] }
           ]
         },
         {
           "id": "openalex-check",
-          "title": "Find your OpenAlex record through your ORCID, not your name",
-          "body": "OpenAlex can attach one ORCID to more than one author entity, and it can attach a namesake's work to yours. Open the record your ORCID resolves to and compare the works against your own list.",
+          "title": "Check the OpenAlex record tied to your ORCID",
+          "body": "Open the author record connected to your ORCID and compare its works with your publication list. Correct missing or misassigned work from the claimed profile.",
           "links": [
-            { "label": "Authors with my ORCID (OpenAlex API)", "tpl": "https://api.openalex.org/authors?filter=orcid:{orcid}", "needs": ["orcid"] },
-            { "label": "My OpenAlex author page", "tpl": "https://openalex.org/{openalex}", "needs": ["openalex"] },
+            { "label": "Open the author record my ORCID resolves to", "tpl": "https://api.openalex.org/authors?filter=orcid:{orcid}", "needs": ["orcid"] },
+            { "label": "Open my OpenAlex page", "tpl": "https://openalex.org/{openalex}", "needs": ["openalex"] },
             { "label": "Search OpenAlex for my name", "tpl": "https://openalex.org/authors?filter=display_name.search:{name}", "needs": ["name"] }
           ]
         },
         {
           "id": "scholar-public",
-          "title": "Make your Google Scholar profile public and verify an institutional email",
-          "body": "A profile that is not public does not appear in Scholar's profile search. Verification uses the email at your institution.",
+          "title": "Make your Scholar profile useful as a public record",
+          "body": "Make the profile public, verify your institutional email when eligible, and check the article list from a signed-out view.",
           "links": [
-            { "label": "My Scholar profile", "tpl": "https://scholar.google.com/citations?user={scholar}&hl=en", "needs": ["scholar"], "fallbackLabel": "Google Scholar citations home", "fallback": "https://scholar.google.com/citations" },
-            { "label": "Scholar profile help", "href": "https://scholar.google.com/intl/en/scholar/citations.html" }
+            { "label": "Open my Scholar profile", "tpl": "https://scholar.google.com/citations?user={scholar}&hl=en", "needs": ["scholar"] },
+            { "label": "Google Scholar citations home", "href": "https://scholar.google.com/citations", "kind": "reference" },
+            { "label": "Scholar profile documentation", "href": "https://scholar.google.com/intl/en/scholar/citations.html", "kind": "reference" }
           ]
         },
         {
           "id": "scholar-merge",
-          "title": "Look for the same paper listed twice",
-          "body": "A preprint and the published version can sit on separate rows, and the citations split between them. Merging is in the profile editor, under the checkbox menu.",
+          "title": "Merge duplicate versions in Scholar",
+          "body": "Look for preprint and published versions of the same paper on separate rows. Merge them when they represent the same work so the citation record stays together.",
           "links": [
-            { "label": "My Scholar profile", "tpl": "https://scholar.google.com/citations?user={scholar}&hl=en", "needs": ["scholar"], "fallbackLabel": "Google Scholar citations home", "fallback": "https://scholar.google.com/citations" }
+            { "label": "Open my Scholar profile", "tpl": "https://scholar.google.com/citations?user={scholar}&hl=en", "needs": ["scholar"] }
           ]
         },
         {
           "id": "lab-page",
           "title": "Check the page your institution or lab publishes about you",
-          "body": "It is often the first result for your name and the slowest to be updated. Confirm it points to your current website and publication list.",
+          "body": "Confirm that it points to your current website and publication list and uses the name and affiliation you want readers to find.",
           "links": [
             { "label": "Search for my name and institution", "tpl": "https://duckduckgo.com/?q={name}+{institution}", "needs": ["name", "institution"] },
             { "label": "Find my institution in ROR", "tpl": "https://ror.org/search?query={institution}", "needs": ["institution"] }
@@ -95,216 +103,222 @@
     },
     {
       "id": "loop",
-      "name": "Close the loop",
-      "slides": "Slides 5 and 9",
-      "intro": "A profile gets someone to your site. The site explains what they found. Link them in both directions so a reader, and a crawler, can get from either one to the other.",
+      "short": "Profile loop",
+      "name": "Close the profile loop",
+      "connection": "Talk: slides 5 and 9 · The profile loop and the website",
+      "intro": "Your profiles identify the researcher; your website explains the work. Link them in both directions so a reader can move from an author record to your site and back.",
       "tasks": [
         {
           "id": "site-to-profiles",
-          "title": "Link your records from your website",
-          "body": "A footer or an about page that lists ORCID, Scholar, Semantic Scholar and OpenAlex gives both a reader and a crawler one place to verify who wrote the work.",
+          "title": "Link your public records from your website",
+          "body": "Put ORCID, Scholar, Semantic Scholar, and OpenAlex somewhere easy to find, such as the footer or about page.",
           "links": [
-            { "label": "My website", "tpl": "{site}/", "needs": ["site"] }
+            { "label": "Open my website", "tpl": "{site}/", "needs": ["site"] }
           ]
         },
         {
           "id": "profiles-to-site",
-          "title": "Link your website from each record",
-          "body": "ORCID takes a researcher URL. Scholar takes a homepage. Both are read by services that build author pages.",
+          "title": "Link your website from the records that support it",
+          "body": "Add the website to ORCID, Scholar, and any other author profile that provides a homepage or researcher-URL field.",
           "links": [
             { "label": "Edit my ORCID record", "href": "https://orcid.org/my-orcid" },
-            { "label": "My Scholar profile", "tpl": "https://scholar.google.com/citations?user={scholar}&hl=en", "needs": ["scholar"], "fallbackLabel": "Google Scholar citations home", "fallback": "https://scholar.google.com/citations" }
+            { "label": "Open my Scholar profile", "tpl": "https://scholar.google.com/citations?user={scholar}&hl=en", "needs": ["scholar"] }
           ]
         },
         {
           "id": "signed-out",
-          "title": "Check every link while signed out",
-          "body": "Open a private window and walk the loop once: profile to site, site to profile. What is visible signed in is not evidence about what is public.",
+          "title": "Walk the loop as a reader",
+          "body": "Open a private window and move from a profile to your website and back. Check that the public pages and links are the ones you intended.",
           "links": [
-            { "label": "My public ORCID record", "tpl": "https://orcid.org/{orcid}", "needs": ["orcid"] },
-            { "label": "My website", "tpl": "{site}/", "needs": ["site"] }
+            { "label": "Open my ORCID record", "tpl": "https://orcid.org/{orcid}", "needs": ["orcid"] },
+            { "label": "Open my website", "tpl": "{site}/", "needs": ["site"] }
           ]
         }
       ]
     },
     {
       "id": "crawl",
-      "name": "Reachable, indexable, verifiable",
-      "slides": "Slides 10 to 13",
-      "intro": "Crawling, indexing and use are separate questions, and a site can pass one and fail the next. Check them in that order.",
+      "short": "Crawl & index",
+      "name": "Check crawling and indexing",
+      "connection": "Talk: slides 10–13 · Crawling, robots.txt, bots, and webmaster tools",
+      "intro": "Now check whether the website can be discovered and verified. Start with crawler access, then the sitemap and index controls, and finish in the webmaster tools.",
       "tasks": [
         {
           "id": "robots",
-          "title": "Read your robots.txt",
-          "body": "It tells crawlers what they may fetch. It does not make a public page private; use access control for that.",
+          "title": "Read your robots.txt as an access policy",
+          "body": "Check which crawlers you allow, which paths you restrict, and which sitemap URLs you advertise. Use authentication for material that needs access control.",
           "links": [
-            { "label": "My robots.txt", "tpl": "{site}/robots.txt", "needs": ["site"] },
-            { "label": "Google's robots.txt documentation", "href": "https://developers.google.com/search/docs/crawling-indexing/robots/intro" }
+            { "label": "Open my robots.txt", "tpl": "{site}/robots.txt", "needs": ["site"] },
+            { "label": "robots.txt documentation", "href": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "kind": "reference" }
           ]
         },
         {
           "id": "sitemap",
-          "title": "Check that your sitemap exists and lists the pages you care about",
-          "body": "Name it in robots.txt as well, which is a discovery route that works without submitting anything.",
+          "title": "Check the sitemap",
+          "body": "Confirm that it loads, lists the pages you care about, and is named in robots.txt. This gives crawlers a direct inventory of those URLs.",
           "links": [
-            { "label": "My sitemap", "tpl": "{site}/sitemap.xml", "needs": ["site"] },
-            { "label": "Sitemap documentation", "href": "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap" }
+            { "label": "Open my sitemap", "tpl": "{site}/sitemap.xml", "needs": ["site"] },
+            { "label": "Sitemap documentation", "href": "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap", "kind": "reference" }
           ]
         },
         {
           "id": "noindex",
-          "title": "Look for an accidental noindex",
-          "body": "A stray robots meta tag or header keeps a page out of results while everything else looks healthy. Check the pages you most want found.",
+          "title": "Check important pages for noindex",
+          "body": "Inspect the pages you most want found for a robots meta tag or response header that prevents indexing.",
           "links": [
-            { "label": "noindex documentation", "href": "https://developers.google.com/search/docs/crawling-indexing/block-indexing" }
+            { "label": "Open my website", "tpl": "{site}/", "needs": ["site"] },
+            { "label": "noindex documentation", "href": "https://developers.google.com/search/docs/crawling-indexing/block-indexing", "kind": "reference" }
           ]
         },
         {
           "id": "console-verify",
-          "title": "Verify your site in Search Console",
-          "body": "A URL-prefix property accepts an HTML file or a meta tag. If your site is on a domain you do not control, such as a github.io address, the domain property cannot be verified because that route needs a DNS record.",
+          "title": "Verify the site in Google Search Console",
+          "body": "Add the property that matches your site and use a verification method you can keep deployed. For a github.io URL-prefix property, an HTML file or meta tag works.",
           "links": [
-            { "label": "Search Console", "href": "https://search.google.com/search-console" },
-            { "label": "Verification methods", "href": "https://support.google.com/webmasters/answer/9008080" }
+            { "label": "Open Search Console", "href": "https://search.google.com/search-console" },
+            { "label": "Verification methods", "href": "https://support.google.com/webmasters/answer/9008080", "kind": "reference" }
           ]
         },
         {
           "id": "console-submit",
-          "title": "Submit your sitemap, then inspect one page that matters",
-          "body": "In the sitemap field you type the path only, because the property prefix is already there. A report tells you what was observed; it does not tell you what to write.",
+          "title": "Submit the sitemap and inspect one important page",
+          "body": "Submit the sitemap, then use URL Inspection on a paper or concept page. Record what Google reports before changing the page.",
           "links": [
-            { "label": "Search Console sitemaps", "href": "https://search.google.com/search-console/sitemaps" },
-            { "label": "URL inspection tool", "href": "https://search.google.com/search-console/inspect" }
+            { "label": "Open Search Console sitemaps", "href": "https://search.google.com/search-console/sitemaps" },
+            { "label": "Open URL Inspection", "href": "https://search.google.com/search-console/inspect" }
           ]
         },
         {
           "id": "bing",
-          "title": "Do the same in Bing Webmaster Tools",
-          "body": "It can import a verified Search Console property, which makes this short.",
+          "title": "Add the site to Bing Webmaster Tools",
+          "body": "Import a verified Search Console property when available, then check the same sitemap and a representative page.",
           "links": [
-            { "label": "Bing Webmaster Tools", "href": "https://www.bing.com/webmasters" }
+            { "label": "Open Bing Webmaster Tools", "href": "https://www.bing.com/webmasters" }
           ]
         }
       ]
     },
     {
       "id": "bots",
-      "name": "AI crawler access is a separate decision",
-      "slides": "Slide 12",
-      "intro": "Search visibility, model training and a visit a user asked for are three different choices, and one robots.txt line does not express all three. Decide each on its own terms.",
+      "short": "Bot access",
+      "name": "Choose AI bot access",
+      "connection": "Talk: slides 11–12 · robots.txt and AI bot access",
+      "intro": "The talk separates search discovery, model training, and user-requested visits. Use robots.txt to record the access you want for each vendor and purpose.",
       "tasks": [
         {
           "id": "bot-choices",
-          "title": "Decide what you allow, bot by bot",
-          "body": "OAI-SearchBot is discovery for ChatGPT search. GPTBot is potential use in training. ChatGPT-User is a visit a reader asked for. Allowing one does not commit you to the others.",
+          "title": "Choose access by purpose",
+          "body": "Review the documented bot names for the services you care about. Decide separately whether you want search discovery, training access, and user-requested visits.",
           "links": [
-            { "label": "OpenAI crawler documentation", "href": "https://platform.openai.com/docs/bots" },
-            { "label": "Google-Extended documentation", "href": "https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers" },
-            { "label": "Anthropic crawler documentation", "href": "https://support.anthropic.com/en/articles/8896518" },
-            { "label": "My robots.txt", "tpl": "{site}/robots.txt", "needs": ["site"] }
+            { "label": "Open my robots.txt", "tpl": "{site}/robots.txt", "needs": ["site"] },
+            { "label": "OpenAI crawler documentation", "href": "https://platform.openai.com/docs/bots", "kind": "reference" },
+            { "label": "Google crawler documentation", "href": "https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers", "kind": "reference" },
+            { "label": "Anthropic crawler documentation", "href": "https://support.anthropic.com/en/articles/8896518", "kind": "reference" }
           ]
         },
         {
           "id": "bot-record",
-          "title": "Write down why you chose what you chose",
-          "body": "The tokens change and the list goes stale. A comment in robots.txt saying when each line was checked, and against which vendor page, is what makes it maintainable.",
+          "title": "Leave yourself a maintenance note",
+          "body": "Add a short comment beside vendor-specific rules with the date and documentation you checked. This makes later updates much easier.",
           "links": []
         }
       ]
     },
     {
       "id": "explain",
-      "name": "Explain the ideas, not only the papers",
-      "slides": "Slides 14 to 18 and 21",
-      "intro": "A reader can know the problem before they know your title. A page about an idea gives them a route in, and it gives an indexing system something to match a topical question against.",
+      "short": "Explain ideas",
+      "name": "Give readers a route into the ideas",
+      "connection": "Talk: slides 14–18 and 21 · Concept pages and public writing",
+      "intro": "A literature-review reader often starts with a problem or concept rather than a paper title. Give important ideas their own useful explanations and connect those explanations back to the evidence.",
       "tasks": [
         {
           "id": "pick-concept",
-          "title": "Name one idea from your work that deserves its own page",
-          "body": "Pick the one a reader would search for without knowing your paper exists.",
+          "title": "Choose one idea a reader might search for",
+          "body": "Pick a term, procedure, failure mode, or design idea that matters to your work and can be understood without knowing the paper title.",
           "links": []
         },
         {
           "id": "concept-shape",
-          "title": "Draft it as definition, explanation, scope, source",
-          "body": "Define the idea, explain how it works in your research, say what the evidence does and does not support, and point to the paper or protocol a reader should check.",
+          "title": "Give the concept page a useful shape",
+          "body": "State the idea, explain how it works in your research, describe the scope of the evidence, and point to the paper or protocol that supports it.",
           "links": []
         },
         {
           "id": "internal-links",
-          "title": "Link where the destination helps the reader",
-          "body": "A link earns its place by explaining a relationship. Say what the reader will find when they follow it.",
+          "title": "Explain why related pages connect",
+          "body": "Link to another page when it helps the reader continue the idea. Use link text that tells them what they will find there.",
           "links": []
         },
         {
           "id": "blog",
-          "title": "Consider a post for the reasoning that does not belong in a paper",
-          "body": "What confused you, why you chose an example, what you want to check next. Where an interpretation is still a proposal, say so near the beginning rather than in a closing caveat.",
+          "title": "Use a post for the reasoning around the research",
+          "body": "Write about the example, decision, confusion, or open question that helps someone understand the work. Keep exploratory interpretations visibly exploratory.",
           "links": []
         }
       ]
     },
     {
       "id": "test",
-      "name": "Test the route with an assistant",
-      "slides": "Slides 19 and 20",
-      "intro": "Ask an assistant to find your work in as few prompts as possible, and record the exact URL it cites. The result is evidence about the route, not a ranking.",
+      "short": "Test route",
+      "name": "Test the public discovery route",
+      "connection": "Talk: slides 19–20 · Testing discovery with GenAI",
+      "intro": "Use an assistant the way a literature-review reader might. Save the prompt, answer, date, product, and cited URLs so you can compare the route after future changes.",
       "tasks": [
         {
           "id": "profile-test",
-          "title": "Profile test: can it describe your work from public sources?",
-          "body": "Record the date, the product, the answer, and every URL it cited. An answer with no citation is a result too.",
+          "title": "Run the researcher test",
+          "body": "Ask for a description of your work from public sources. Save which profiles and pages the answer uses.",
           "prompt": "Who is {name}, and what do they research? Cite the sources you used.",
           "links": []
         },
         {
           "id": "literature-test",
-          "title": "Literature test: does your work surface for a topic question?",
-          "body": "Ask the question a reader in your area would ask, without naming yourself or your title.",
+          "title": "Run the topic test",
+          "body": "Ask a research question in your area without naming yourself or the paper. Record whether your work appears and which source leads to it.",
           "prompt": "I am looking for recent work on <your topic>. What should I read, and who works on it? Cite sources.",
           "links": []
         },
         {
           "id": "website-test",
-          "title": "Website test: which of your pages does it use?",
-          "body": "This is the one that tells you whether the explanations you wrote are reachable and represented accurately.",
+          "title": "Run the website test",
+          "body": "Give the assistant your site and ask what it thinks you work on, which pages it used, and what it could not resolve from the public text.",
           "prompt": "Read {site} and summarise what this researcher works on. Which pages did you use, and what is missing or wrong?",
           "links": [
-            { "label": "My website", "tpl": "{site}/", "needs": ["site"] }
+            { "label": "Open my website", "tpl": "{site}/", "needs": ["site"] }
           ]
         },
         {
           "id": "accuracy",
-          "title": "Check whether the answer kept the scope of the claim",
-          "body": "An answer that finds your paper and overstates what it showed is a different problem from an answer that cannot find it, and it needs a different fix.",
+          "title": "Check the answer against the source",
+          "body": "Confirm that the generated description preserves the scope, status, and evidence of the work it cites. Record any overstatement or missing context.",
           "links": []
         }
       ]
     },
     {
       "id": "measure",
-      "name": "Measure the route, and keep it coherent",
-      "slides": "Slides 22 and 23",
-      "intro": "Keep a small, repeatable record. The work stays small when each publication and each explanation gets checked at the moment it changes.",
+      "short": "Maintain",
+      "name": "Measure and maintain the route",
+      "connection": "Talk: slides 22–23 · Measurement and maintenance",
+      "intro": "Keep a small repeatable record. Each new publication or explanation becomes a trigger to check the public route once, fix what changed, and move on.",
       "tasks": [
         {
           "id": "record",
-          "title": "Start a one-page log",
-          "body": "Question, date, product, answer, cited URL, and whether the citation preserved the scope. Four lines per check is enough to see movement.",
+          "title": "Keep a one-page discovery log",
+          "body": "Record the question, date, product, answer, cited URL, and whether the answer represented the source accurately.",
           "links": []
         },
         {
           "id": "routine",
-          "title": "Set the trigger, not the schedule",
-          "body": "After a publication or a profile change, check the DOI record, the public author profiles, the paper page and the CV. After a new explanation, link it from wherever it helps a reader.",
+          "title": "Use publication and writing changes as triggers",
+          "body": "After a publication or profile change, check the DOI record, profiles, paper page, and CV. After a new concept page or post, add the relevant links and rerun the same discovery check.",
           "links": []
         }
       ]
     }
   ],
   "discussion": {
-    "name": "Questions for the room",
-    "slides": "Slide 24",
+    "name": "Bring these questions to the discussion",
     "items": [
       "What profile record would you fix first?",
       "Which concept page would help a literature-review reader?",

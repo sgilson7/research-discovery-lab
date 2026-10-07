@@ -69,3 +69,92 @@ button:hover { background: var(--tint); }
   .panel, .station, .links a { border: 1px solid; }
   .task.done, .station > header, .permission { background: Canvas; }
 }
+
+/* ---------------------------------------------------------------- revision 2
+   The details form groups, the route diagram, the link hierarchy and the task
+   status badges. The route is an ordered list of buttons rather than an SVG:
+   a button is reachable, focusable and announced without any extra wiring, and
+   the snake layout is a grid concern rather than a drawing one. */
+
+.fieldgroup { margin-bottom: 1rem; }
+.fieldgroup h3 { font-size: .82rem; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--grey); margin: 0 0 .45rem; border-bottom: 1px solid var(--rule); padding-bottom: .2rem; }
+.fieldgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .8rem; }
+.fields { display: block; }
+/* `display` beats the hidden attribute, and .fields sets display, so the
+   collapse did nothing until this rule existed. */
+[hidden] { display: none !important; }
+.dsum { font-size: .9rem; color: var(--ink); background: #F4F6F7;
+  border-left: 3px solid var(--edge); padding: .45rem .6rem; margin: 0 0 .6rem; }
+
+/* The route. Four across on desktop; the second row is reversed so the path
+   snakes 1-2-3-4 then 7-6-5 back, matching the diagram language of the talk. */
+.route { list-style: none; margin: .2rem 0 .7rem; padding: 0;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; }
+.routeitem { display: flex; }
+.routeitem:nth-child(5) { grid-row: 2; grid-column: 4; }
+.routeitem:nth-child(6) { grid-row: 2; grid-column: 3; }
+.routeitem:nth-child(7) { grid-row: 2; grid-column: 2; }
+.node { position: relative; width: 100%; text-align: left; cursor: pointer;
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto auto;
+  gap: .05rem .45rem; align-items: center;
+  border: 1px solid var(--rule); border-radius: 7px; background: #fff;
+  padding: .5rem .55rem .4rem; font: inherit; }
+.node:hover { border-color: var(--edge); }
+.node:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+.node .num { grid-row: 1 / span 2; width: 1.6rem; height: 1.6rem; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700; font-size: .85rem;
+  border: 1px solid var(--edge); color: var(--ink); background: #fff; }
+.node .lab { font-weight: 600; font-size: .9rem; line-height: 1.2; }
+.node .count { font-size: .78rem; color: var(--grey); }
+.node .strip { grid-column: 1 / -1; display: flex; gap: 1px; margin-top: .3rem; height: 5px; }
+.node .strip .seg { flex: 1; background: #fff; border: 1px solid var(--rule); }
+.node .strip .seg.d { background: var(--green); border-color: var(--green); }
+.node .strip .seg.s { background: var(--edge); border-color: var(--edge); }
+.node.complete { background: #F2F8F4; border-color: var(--green); }
+.node.complete .num { background: var(--green); border-color: var(--green); color: #fff; }
+.node.next { border-color: var(--red); border-width: 2px; background: var(--tint); }
+.node.next .num { border-color: var(--red); }
+.nexttag { position: absolute; top: -.55rem; right: .45rem; background: var(--red); color: #fff;
+  font-size: .62rem; font-weight: 700; letter-spacing: .07em; padding: .05rem .3rem; border-radius: 3px; }
+.nextline { font-weight: 600; margin-top: -.3rem; }
+
+@media (max-width: 44rem) {
+  .route { grid-template-columns: 1fr; }
+  .routeitem:nth-child(n) { grid-row: auto; grid-column: 1; }
+}
+
+/* Task status and the two link roles. */
+.task.done h3 { text-decoration: none; }
+.task.skipped { opacity: 1; }
+.badge { grid-column: 2; margin: 0 0 .1rem; font-size: .76rem; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase; }
+.badge.done { color: var(--green); }
+.badge.skipped { color: var(--grey); }
+.links.primary a { border-color: var(--red); font-weight: 600; }
+.links.primary a:hover { background: var(--tint); }
+.refwrap { display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem; margin-bottom: .35rem; }
+.reflabel { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--grey); }
+.links.reference a { border-color: var(--rule); color: var(--grey); font-size: .83rem; }
+.links.reference a:hover { background: #F4F6F7; }
+.links li { display: flex; flex-direction: column; gap: .15rem; }
+a.needs { border-style: dashed; opacity: .8; }
+.needsnote { font-size: .78rem; color: var(--grey); }
+.promptrow { margin: -.25rem 0 .45rem; }
+button.small { font-size: .8rem; padding: .22rem .5rem; }
+.stnum { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem;
+  border-radius: 50%; background: var(--red); color: #fff; font-size: .85rem;
+  font-weight: 700; margin-right: .5rem; vertical-align: .05rem; }
+.connection { color: var(--grey); font-size: .88rem; margin: 0; }
+.discussion { border: 1px solid var(--rule); border-top: 3px solid var(--red);
+  padding: .9rem 1rem; margin: 0 0 1.2rem; background: var(--tint); }
+.discussion h2 { margin-bottom: .4rem; }
+.discussion ul { margin: 0; padding-left: 1.1rem; }
+.station:focus { outline: none; }
+
+@media (forced-colors: active) {
+  .node, .node .num, .links a { border: 1px solid; }
+  .node.complete, .node.next, .discussion, .dsum { background: Canvas; }
+  .nexttag { border: 1px solid; }
+  .node .strip .seg { border: 1px solid; }
+}

@@ -23,9 +23,11 @@
 
   <section class="panel" id="details-panel" aria-labelledby="details-h">
     <h2 id="details-h">Your details</h2>
-    <p class="note">Every field is optional. What you fill in is used to build direct links to your own records. It is stored in this browser only, and nothing is sent anywhere.</p>
+    <p class="note" id="details-note"></p>
+    <p class="dsum" id="details-summary" hidden></p>
+    <p class="actions"><button type="button" id="details-toggle" aria-expanded="true" aria-controls="fields" hidden>Hide details</button></p>
     <div id="fields" class="fields"></div>
-    <p class="actions">
+    <p class="actions" id="details-actions">
       <button type="button" id="clear">Clear my details</button>
       <span id="saved" class="saved" role="status"></span>
     </p>
@@ -33,15 +35,16 @@
 
   <section class="panel progress" aria-labelledby="progress-h">
     <h2 id="progress-h">Progress</h2>
-    <div class="bar"><div id="bar-done"></div><div id="bar-skip"></div></div>
+    <ol id="route" class="route" aria-label="The research discovery route"></ol>
     <p id="progress-text" role="status"></p>
-    <p class="actions"><button type="button" id="copy">Copy my summary</button> <span id="copied" class="saved" role="status"></span></p>
+    <p id="progress-next" class="nextline"></p>
+    <p class="actions"><button type="button" id="copy">Copy my next steps</button> <span id="copied" class="saved" role="status"></span></p>
   </section>
 
   <div id="stations"></div>
 
   <footer class="foot">
-    <p id="discussion-wrap"></p>
+    <section class="discussion" id="discussion-wrap" aria-labelledby="disc-h"></section>
     <p><a href="https://sgilson7.github.io/">Sam Gilson</a> · <a href="https://github.com/sgilson7/research-discovery-lab">Source</a></p>
   </footer>
 </main>

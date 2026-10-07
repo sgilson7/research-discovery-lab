@@ -37,6 +37,7 @@ function save(key, value) {
 let DATA = null;
 let details = load(KEY_DETAILS, {});
 let state = load(KEY_STATE, {}); // taskId -> 'done' | 'skipped'
+let collapsed = false; // the details form is never collapsed while someone types
 
 /** ORCID and the id fields are pasted, often as a whole URL. Take the id out of
  *  whatever was pasted rather than telling someone they typed it wrong. */
@@ -100,13 +101,80 @@ function labelFor(fieldId) {
   return f ? f.label : fieldId;
 }
 
+/** Per-station counts. The diagram and the summary both read this, so there is
+ *  one definition of what "resolved" means: a task is resolved when it has been
+ *  done or deliberately skipped. */
+function stationProgress(station) {
+  const total = station.tasks.length;
+  let done = 0;
+  let skipped = 0;
+  for (const t of station.tasks) {
+    if (state[t.id] === 'done') done += 1;
+    else if (state[t.id] === 'skipped') skipped += 1;
+  }
+  const resolved = done + skipped;
+  return { total, done, skipped, remaining: total - resolved, resolved, complete: resolved === total };
+}
+
+/** The first station with a task still to do, or null when the route is done.
+ *  This is what the NEXT marker and the summary's "Next:" line both use. */
+function nextStation() {
+  return DATA.stations.find((s) => stationProgress(s).remaining > 0) || null;
+}
+
+function nextTask() {
+  const s = nextStation();
+  if (!s) return null;
+  const t = s.tasks.find((t) => !state[t.id]);
+  return t ? { station: s, task: t } : null;
+}
+
 function allTasks() {
   return DATA.stations.flatMap((s) => s.tasks.map((t) => ({ station: s, task: t })));
+}
+
+/** The compact line shown when the form is collapsed, and above it when open. */
+function detailsSummary() {
+  const filled = DATA.fields.filter((f) => has(f.id));
+  if (!filled.length) return '';
+  return filled.map((f) => f.label + ': ' + details[f.id]).join(' · ');
+}
+
+function renderDetailsSummary() {
+  const line = $('details-summary');
+  const toggle = $('details-toggle');
+  const text = detailsSummary();
+  line.textContent = text;
+  line.hidden = !text;
+  toggle.hidden = !text;
+  toggle.textContent = collapsed ? 'Edit my details' : 'Hide details';
+  toggle.setAttribute('aria-expanded', String(!collapsed));
+  $('fields').hidden = collapsed;
+  $('details-actions').hidden = collapsed;
 }
 
 function renderFields() {
   const wrap = $('fields');
   wrap.textContent = '';
+  const groups = DATA.fieldGroups || [{ name: '', fields: DATA.fields.map((f) => f.id) }];
+  for (const g of groups) {
+    const box = document.createElement('div');
+    box.className = 'fieldgroup';
+    if (g.name) {
+      const h = document.createElement('h3');
+      h.textContent = g.name;
+      box.append(h);
+    }
+    const inner = document.createElement('div');
+    inner.className = 'fieldgrid';
+    box.append(inner);
+    wrap.append(box);
+    g._inner = inner;
+  }
+  const where = (id) => {
+    const g = groups.find((x) => x.fields.includes(id));
+    return (g || groups[0])._inner;
+  };
   for (const f of DATA.fields) {
     const d = document.createElement('div');
     d.className = 'field';
@@ -123,13 +191,14 @@ function renderFields() {
       save(KEY_DETAILS, details);
       flash($('saved'), 'Saved in this browser');
       renderStations();
+      renderDetailsSummary();
     });
     input.addEventListener('blur', () => { input.value = details[f.id] || ''; });
     const hint = document.createElement('p');
     hint.className = 'hint';
     hint.textContent = f.hint || '';
     d.append(label, input, hint);
-    wrap.append(d);
+    where(f.id).append(d);
   }
 }
 
@@ -156,12 +225,17 @@ function renderStations() {
     sec.className = 'station';
     sec.id = 'station-' + s.id;
 
+    sec.tabIndex = -1;
+    const idx = DATA.stations.indexOf(s) + 1;
     const head = document.createElement('header');
     const h = document.createElement('h2');
-    h.textContent = s.name;
+    const n = document.createElement('span');
+    n.className = 'stnum';
+    n.textContent = String(idx);
+    h.append(n, document.createTextNode(s.name));
     const sl = document.createElement('p');
-    sl.className = 'slides';
-    sl.textContent = s.slides || '';
+    sl.className = 'connection';
+    sl.textContent = s.connection || '';
     head.append(h, sl);
     sec.append(head);
 
@@ -175,7 +249,7 @@ function renderStations() {
     const sb = document.createElement('button');
     sb.type = 'button';
     const allSkipped = s.tasks.every((t) => state[t.id] === 'skipped');
-    sb.textContent = allSkipped ? 'Bring this station back' : 'Skip this whole station';
+    sb.textContent = allSkipped ? 'Restore station' : 'Skip station';
     sb.addEventListener('click', () => {
       for (const t of s.tasks) {
         if (allSkipped) delete state[t.id];
@@ -216,49 +290,165 @@ function renderTask(t) {
   body.className = 'body';
   body.textContent = t.body;
 
-  el.append(state_, h, body);
+  el.append(state_, h);
+  if (state[t.id]) {
+    const badge = document.createElement('p');
+    badge.className = 'badge ' + state[t.id];
+    badge.textContent = state[t.id] === 'done' ? '\u2713 Done' : 'Skipped';
+    el.append(badge);
+  }
+  el.append(body);
 
   if (t.prompt) {
+    const text = fill(t.prompt);
     const p = document.createElement('pre');
     p.className = 'prompt';
-    p.textContent = fill(t.prompt);
-    el.append(p);
+    p.textContent = text;
+    const row = document.createElement('p');
+    row.className = 'promptrow';
+    const cp = document.createElement('button');
+    cp.type = 'button';
+    cp.className = 'small';
+    cp.textContent = 'Copy prompt';
+    const said = document.createElement('span');
+    said.className = 'saved';
+    cp.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+        flash(said, 'Copied');
+      } catch (_) {
+        window.prompt('Copy this prompt', text);
+      }
+    });
+    row.append(cp, said);
+    el.append(p, row);
   }
 
   if (t.links && t.links.length) {
-    const ul = document.createElement('ul');
-    ul.className = 'links';
-    for (const link of t.links) {
-      const r = resolveLink(link);
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.textContent = r.label;
-      if (r.ready) {
-        a.href = r.href;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-      } else {
-        a.className = 'needs';
-        a.href = '#details-panel';
-        const names = r.missing.map(labelFor).join(' and ');
-        a.title = 'Add your ' + names + ' above to build this link';
-        a.textContent = r.label + ' — add your ' + names;
-      }
-      li.append(a);
-      ul.append(li);
+    // Two roles. A link to the participant's own record is the task's action; a
+    // vendor or help page is reference. Mixing them made everything read as
+    // equally urgent.
+    const primary = t.links.filter((l) => l.kind !== 'reference');
+    const reference = t.links.filter((l) => l.kind === 'reference');
+
+    if (primary.length) {
+      const ul = document.createElement('ul');
+      ul.className = 'links primary';
+      for (const link of primary) ul.append(linkItem(link));
+      el.append(ul);
     }
-    el.append(ul);
+    if (reference.length) {
+      const wrap = document.createElement('div');
+      wrap.className = 'refwrap';
+      const lab = document.createElement('span');
+      lab.className = 'reflabel';
+      lab.textContent = 'Reference';
+      const ul = document.createElement('ul');
+      ul.className = 'links reference';
+      for (const link of reference) ul.append(linkItem(link));
+      wrap.append(lab, ul);
+      el.append(wrap);
+    }
   }
 
   const btns = document.createElement('div');
   btns.className = 'rowbtns';
   const skip = document.createElement('button');
   skip.type = 'button';
-  skip.textContent = state[t.id] === 'skipped' ? 'Unskip' : 'Skip this';
+  skip.textContent = state[t.id] === 'skipped' ? 'Restore' : 'Skip for now';
   skip.addEventListener('click', () => setState(t.id, 'skipped'));
   btns.append(skip);
   el.append(btns);
   return el;
+}
+
+/** The route: one node per station, in talk order, filling in as the lab is
+ *  worked through. State is carried by the count, the strip, the tick and the
+ *  NEXT label as well as by colour, because colour is never the only cue. */
+function renderRoute() {
+  const root = $('route');
+  root.textContent = '';
+  const next = nextStation();
+  DATA.stations.forEach((s, i) => {
+    const p = stationProgress(s);
+    const node = document.createElement('button');
+    node.type = 'button';
+    node.className = 'node' + (p.complete ? ' complete' : '') + (next && next.id === s.id ? ' next' : '');
+    node.dataset.station = s.id;
+
+    const num = document.createElement('span');
+    num.className = 'num';
+    num.textContent = String(i + 1);
+
+    const lab = document.createElement('span');
+    lab.className = 'lab';
+    lab.textContent = s.short || s.name;
+
+    const count = document.createElement('span');
+    count.className = 'count';
+    count.textContent = p.complete ? '\u2713 ' + p.resolved + '/' + p.total : p.resolved + '/' + p.total;
+
+    const strip = document.createElement('span');
+    strip.className = 'strip';
+    strip.setAttribute('aria-hidden', 'true');
+    for (const t of s.tasks) {
+      const seg = document.createElement('span');
+      const st = state[t.id];
+      seg.className = 'seg ' + (st === 'done' ? 'd' : st === 'skipped' ? 's' : 'r');
+      strip.append(seg);
+    }
+
+    node.append(num, lab, count, strip);
+    if (next && next.id === s.id) {
+      const tag = document.createElement('span');
+      tag.className = 'nexttag';
+      tag.textContent = 'NEXT';
+      node.append(tag);
+    }
+    node.setAttribute(
+      'aria-label',
+      'Station ' + (i + 1) + ', ' + s.name + '. ' +
+        p.done + ' completed, ' + p.skipped + ' skipped, ' + p.remaining + ' remaining' +
+        (next && next.id === s.id ? '. Next station.' : p.complete ? '. Complete.' : '.')
+    );
+    node.addEventListener('click', () => {
+      const el = document.getElementById('station-' + s.id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.focus({ preventScroll: true });
+      }
+    });
+
+    const li = document.createElement('li');
+    li.className = 'routeitem';
+    li.append(node);
+    root.append(li);
+  });
+}
+
+/** One link. A link whose field is missing keeps its normal label and says what
+ *  to add underneath, so the label stays scannable. */
+function linkItem(link) {
+  const r = resolveLink(link);
+  const li = document.createElement('li');
+  const a = document.createElement('a');
+  a.textContent = r.label;
+  if (r.ready) {
+    a.href = r.href;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    li.append(a);
+  } else {
+    a.className = 'needs';
+    a.href = '#details-panel';
+    li.append(a);
+    const note = document.createElement('span');
+    note.className = 'needsnote';
+    const names = r.missing.map(labelFor).join(' and ');
+    note.textContent = 'Add your ' + names + ' above to personalize this link.';
+    li.append(note);
+  }
+  return li;
 }
 
 function renderProgress() {
@@ -266,24 +456,38 @@ function renderProgress() {
   const done = all.filter(({ task }) => state[task.id] === 'done').length;
   const skipped = all.filter(({ task }) => state[task.id] === 'skipped').length;
   const total = all.length;
-  $('bar-done').style.width = (done / total) * 100 + '%';
-  $('bar-skip').style.width = (skipped / total) * 100 + '%';
+  const resolved = done + skipped;
   $('progress-text').textContent =
-    done + ' of ' + total + ' done, ' + skipped + ' skipped, ' +
-    (total - done - skipped) + ' left. Skipping is a finished answer too.';
+    resolved + ' of ' + total + ' steps resolved \u00b7 ' + done + ' completed \u00b7 ' +
+    skipped + ' skipped \u00b7 ' + (total - resolved) + ' remaining';
+  const next = nextStation();
+  $('progress-next').textContent = next
+    ? 'Next: ' + next.name
+    : 'Lab route complete. Your summary is ready below.';
+  renderRoute();
 }
 
+/** The copied text. It deliberately carries NO profile identifiers: those stay
+ *  in the browser, and a next-steps list is something a participant may paste
+ *  into a shared document. */
 function summary() {
-  const lines = ['Research discovery lab — ' + new Date().toISOString().slice(0, 10), ''];
-  for (const f of DATA.fields) {
-    if (has(f.id)) lines.push(f.label + ': ' + details[f.id]);
-  }
-  lines.push('');
-  for (const s of DATA.stations) {
-    const done = s.tasks.filter((t) => state[t.id] === 'done');
-    const left = s.tasks.filter((t) => !state[t.id]);
-    lines.push(s.name + ' — ' + done.length + '/' + s.tasks.length + ' done');
-    for (const t of left) lines.push('  still to do: ' + t.title);
+  const all = allTasks();
+  const total = all.length;
+  const done = all.filter(({ task }) => state[task.id] === 'done').length;
+  const skipped = all.filter(({ task }) => state[task.id] === 'skipped').length;
+  const nt = nextTask();
+  const lines = [
+    'Research discovery lab \u2014 ' + new Date().toISOString().slice(0, 10),
+    (done + skipped) + ' of ' + total + ' steps resolved (' + done + ' completed, ' + skipped + ' skipped)',
+    nt ? 'Next: ' + nt.task.title : 'Next: nothing left — the route is complete.',
+    '',
+  ];
+  for (const st of DATA.stations) {
+    const p = stationProgress(st);
+    lines.push(st.name + ' \u2014 ' + p.done + ' completed, ' + p.skipped + ' skipped, ' + p.remaining + ' remaining');
+    for (const t of st.tasks) {
+      if (!state[t.id]) lines.push('  - ' + t.title);
+    }
   }
   return lines.join('\n');
 }
@@ -293,7 +497,8 @@ function renderDiscussion() {
   if (!d) return;
   const wrap = $('discussion-wrap');
   wrap.textContent = '';
-  const h = document.createElement('strong');
+  const h = document.createElement('h2');
+  h.id = 'disc-h';
   h.textContent = d.name;
   const ul = document.createElement('ul');
   for (const item of d.items) {
@@ -311,15 +516,24 @@ async function main() {
   $('title').textContent = DATA.title;
   $('subtitle').textContent = DATA.subtitle;
   $('permission').textContent = DATA.permission;
+  $('details-note').textContent = DATA.detailsNote || '';
+  collapsed = false;
   renderFields();
+  renderDetailsSummary();
   renderStations();
   renderProgress();
   renderDiscussion();
+
+  $('details-toggle').addEventListener('click', () => {
+    collapsed = !collapsed;
+    renderDetailsSummary();
+  });
 
   $('clear').addEventListener('click', () => {
     details = {};
     save(KEY_DETAILS, details);
     renderFields();
+    renderDetailsSummary();
     renderStations();
     flash($('saved'), 'Cleared');
   });
@@ -337,3 +551,13 @@ async function main() {
 }
 
 main();
+
+// Exposed so the browser check can exercise the station-level progress maths
+// and the next-station choice without driving the whole page.
+window.__rdl = {
+  stationProgress: (id) => stationProgress(DATA.stations.find((s) => s.id === id)),
+  nextStationId: () => (nextStation() ? nextStation().id : null),
+  setState: (taskId, value) => { state[taskId] = value; save(KEY_STATE, state); renderStations(); renderProgress(); },
+  clearState: () => { state = {}; save(KEY_STATE, state); renderStations(); renderProgress(); },
+  summary,
+};
