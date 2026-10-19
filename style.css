@@ -5,6 +5,7 @@
   --tint: #F7E9E9;
   --edge: #9AA4AB;
   --red: #8B2E2E;
+  --red-muted: #A04848;
   --green: #2A6B4A;
   --page: #FFFFFF;
   --sans: "Segoe UI", Helvetica, Arial, sans-serif;
@@ -58,7 +59,7 @@ button:hover { background: var(--tint); }
 .links a { display: inline-block; border: 1px solid var(--edge); border-radius: 3px;
   padding: .22rem .55rem; font-size: .88rem; text-decoration: none; background: #fff; }
 .links a:hover { background: var(--tint); text-decoration: underline; }
-.links a.needs { opacity: .72; border-style: dashed; }
+.links a.needs { border-style: dashed; color: var(--red-muted); }
 .prompt { font-family: var(--mono); font-size: .86rem; background: #F4F6F7;
   border-left: 3px solid var(--edge); padding: .5rem .6rem; margin: .1rem 0 .45rem; white-space: pre-wrap; }
 .rowbtns { display: flex; gap: .4rem; flex-wrap: wrap; }
@@ -138,7 +139,10 @@ button:hover { background: var(--tint); }
 .links.reference a { border-color: var(--rule); color: var(--grey); font-size: .83rem; }
 .links.reference a:hover { background: #F4F6F7; }
 .links li { display: flex; flex-direction: column; gap: .15rem; }
-a.needs { border-style: dashed; opacity: .8; }
+/* A link that still needs a detail is muted with a lighter red rather than
+   opacity: opacity took the text to 4.2:1 on white, under WCAG AA's 4.5:1.
+   --red-muted is 5.97:1 on white and 5.06:1 on the hover tint. */
+a.needs { border-style: dashed; opacity: 1; }
 .needsnote { font-size: .78rem; color: var(--grey); }
 .promptrow { margin: -.25rem 0 .45rem; }
 button.small { font-size: .8rem; padding: .22rem .5rem; }

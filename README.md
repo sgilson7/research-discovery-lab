@@ -37,3 +37,7 @@ python3 -m http.server 8080
 
 GitHub Pages, from the default branch root. No build step, so what is in the
 repository is what is served.
+
+## Licence
+
+MIT. See `LICENSE`.
